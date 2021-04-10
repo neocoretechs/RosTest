@@ -8,6 +8,7 @@ import org.ros.namespace.GraphName;
 import org.ros.namespace.NameResolver;
 import org.ros.node.AbstractNodeMain;
 import org.ros.node.ConnectedNode;
+import org.ros.node.NodeMain;
 import org.ros.node.parameter.ParameterTree;
 import org.ros.node.topic.Publisher;
 
@@ -26,13 +27,23 @@ import java.util.concurrent.CountDownLatch;
  */
 public class ParameterServerTestNode extends AbstractNodeMain {
   private static final Log log = LogFactory.getLog(ParameterServerTestNode.class);
+  private static volatile ParameterServerTestNode instance = null;
+  public static NodeMain getInstance() {
+		synchronized(ParameterServerTestNode.class) {
+			if(instance == null) {
+				instance = new ParameterServerTestNode();
+			}
+		}
+		return instance;
+	}
   private CountDownLatch awaitStart = new CountDownLatch(1);
   NameResolver resolver = null;
   @Override
   public GraphName getDefaultNodeName() {
     return GraphName.of("rosjava/parameter_server_test_node");
   }
-
+  private ParameterServerTestNode() {}
+  
   @SuppressWarnings("rawtypes")
   @Override
   public void onStart(ConnectedNode connectedNode) {
